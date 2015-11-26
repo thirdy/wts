@@ -1,0 +1,7 @@
+;
+; Leagues
+;
+standard|sc	= league=Standard
+hardcore|hc = league=Hardcore
+darkshrinehc  	= league=Darkshrine HC (IC004)
+darkshrine 		= league=Darkshrine (IC003)
