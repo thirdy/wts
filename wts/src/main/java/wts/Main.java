@@ -17,19 +17,16 @@
  */
 package wts;
 
-import java.awt.Dialog;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 
-import org.apache.commons.io.input.Tailer;
-import org.apache.commons.io.input.TailerListenerAdapter;
-
-import javafx.application.Application;
-import wts.util.Dialogs;
+import wts.SearchPageScraper.SearchResultItem;
+import wts.util.CommandLine;
 
 /**
  * @author thirdy
@@ -43,8 +40,16 @@ public class Main {
 	public static void main(String[] args) throws Exception {
 		config = loadConfig();
 		language = new BlackmarketLanguage();
+		CommandLine cmd = new CommandLine(args);
 		
-		Application.launch(MainStage.class, args);
+		String query = cmd.getArguments()[0];
+		String sort = cmd.getNumberOfArguments() == 2 ? cmd.getArguments()[1] : "price_in_chaos";
+		
+		String html = runSearch(query, sort);
+		
+		SearchPageScraper scraper = new SearchPageScraper(html);
+		List<SearchResultItem> items = scraper.parse();
+		items.stream().forEach(i -> System.out.println(i.getWTB()));
     }
 
     private static Properties loadConfig() throws IOException, FileNotFoundException {
@@ -53,5 +58,22 @@ public class Main {
 			config.load(br);
 		}
 		return config;
+	}
+    
+//	public static String runSearch(String query) {
+//		return runSearch(query, "price_in_chaos");
+//	}
+	public static String runSearch(String query, String sort) {
+    	String queryPrefix = config.getProperty("queryprefix");
+		String finalQuery = queryPrefix + " " + query;
+		System.out.println("finalQuery: " + finalQuery);
+		System.out.println("sort: " + sort);
+		String payload = language.parse(finalQuery);
+		long start = System.currentTimeMillis();
+		BackendClient backendClient = new BackendClient();
+		String searchPage = backendClient.search(payload , "sort=" + sort + "&bare=true");
+		long end = System.currentTimeMillis();
+		System.out.println("Took " + (end - start) + " ms");
+		return searchPage;
 	}
 }

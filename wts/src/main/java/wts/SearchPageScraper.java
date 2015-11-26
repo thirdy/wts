@@ -119,15 +119,15 @@ public class SearchPageScraper {
 			// ----- Properties ----- //
 			// this is the third column data (the first col is the image, second is the mods, reqs)
 			item.quality = element.getElementsByAttributeValue("data-name", "q").get(0).text();
-			item.physDmgRangeAtMaxQuality = element.getElementsByAttributeValue("data-name", "quality_pd").get(0).text();
+			item.physDmgRangeAtMaxQuality = element.getElementsByAttributeValue("data-name", "pd").get(0).text();
 			item.eleDmgRange = element.getElementsByAttributeValue("data-name", "ed").get(0).text();
 			item.attackSpeed = element.getElementsByAttributeValue("data-name", "aps").get(0).text();
-			item.dmgAtMaxQuality = element.getElementsByAttributeValue("data-name", "quality_dps").get(0).text();
-			item.physDmgAtMaxQuality = element.getElementsByAttributeValue("data-name", "quality_pdps").get(0).text();
+			item.dmgAtMaxQuality = element.getElementsByAttributeValue("data-name", "dps").get(0).text();
+			item.physDmgAtMaxQuality = element.getElementsByAttributeValue("data-name", "pdps").get(0).text();
 			item.eleDmg = element.getElementsByAttributeValue("data-name", "edps").get(0).text();
-			item.armourAtMaxQuality = element.getElementsByAttributeValue("data-name", "quality_armour").get(0).text();
-			item.evasionAtMaxQuality = element.getElementsByAttributeValue("data-name", "quality_evasion").get(0).text();
-			item.energyShieldAtMaxQuality = element.getElementsByAttributeValue("data-name", "quality_shield").get(0).text();
+			item.armourAtMaxQuality = element.getElementsByAttributeValue("data-name", "armour").get(0).text();
+			item.evasionAtMaxQuality = element.getElementsByAttributeValue("data-name", "evasion").get(0).text();
+			item.energyShieldAtMaxQuality = element.getElementsByAttributeValue("data-name", "shield").get(0).text();
 			item.block = element.getElementsByAttributeValue("data-name", "block").get(0).text();
 			item.crit = element.getElementsByAttributeValue("data-name", "crit").get(0).text();
 			// "level"
