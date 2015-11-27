@@ -36,6 +36,8 @@ import java.util.Properties;
 
 import javax.swing.JOptionPane;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import wts.SearchPageScraper.SearchResultItem;
 import wts.util.SwingUtil;
 
@@ -111,7 +113,7 @@ public class Main {
 		line = substringAfterLast(line, ":").trim();
 		
 		if (!startsWithAny(line, new String[]{"#", "@", "$"})) {
-			if (line.equalsIgnoreCase("searchexit")) {
+			if (line.equalsIgnoreCase("searchexit") || line.equalsIgnoreCase("sexit")) {
 				setDisplayMessage("$EXIT");
 				return true; 
 			}
@@ -170,11 +172,16 @@ public class Main {
 			currentPage = 0;
 			updateDisplay(currentPage);
 		} catch (Exception e) {
-			setDisplayMessage(("Error: " + e.getMessage()));
+			setDisplayMessage(("Error: " + e.getMessage() + "$LF" + ExceptionUtils.getStackTrace(e)));
 		}
 	}
 
 	private void updateDisplay(int page) throws IOException {
+		if(items.isEmpty()) {
+			setDisplayMessage("Result: " + 0);
+			return;			
+		}
+		
 		int skip = (pageSize * page) % items.size();
 		if (skip >= items.size()) {
 			--currentPage;
