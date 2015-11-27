@@ -29,13 +29,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
@@ -54,11 +51,12 @@ public class Main {
 	static String logPath;
 	static String ahkScript;
 	static int pageSize;
-	
+	BackendClient backendClient = new BackendClient();
 	List<SearchResultItem> items = Collections.emptyList();
 	int currentPage = 0;
 	
 	private long lastKnownPosition = 0;
+	private String location = "";
 	
 	public static void main(String[] args) throws Exception {
 		try {
@@ -120,6 +118,7 @@ public class Main {
 			if (line.equalsIgnoreCase("searchend") || line.equalsIgnoreCase("se")) {
 				setDisplayMessage("$EXIT");
 				items = Collections.emptyList();
+				location = "";
 			} else if (isNumeric(line) && !items.isEmpty()) {
 				int idx = Integer.parseInt(line);
 				String wtb = items.get(idx).getWTB();
@@ -130,6 +129,8 @@ public class Main {
 				updateDisplay(--currentPage);
 			} else if (line.equalsIgnoreCase("reload")) {
 				reloadConfig();
+			} else if (line.startsWith("sort") && !items.isEmpty() && !location.isEmpty()) {
+				runSearch(line, true);
 			} else if (line.toLowerCase().matches("pagesize\\d+")) {
 				String strPageSize = substringAfter(line.toLowerCase(), "pagesize");
 				if (isNumeric( strPageSize )) {
@@ -145,25 +146,24 @@ public class Main {
 			} else if (line.startsWith("search")) {
 				String terms = substringAfter(line, "search").trim();
 				if (!terms.isEmpty()) {
-					runSearch(terms);
+					runSearch(terms, false);
 				}
 			} else if (line.startsWith("s ")) {
 				String terms = substringAfter(line, "s ").trim();
 				if (!terms.isEmpty()) {
-					runSearch(terms);
+					runSearch(terms, false);
 				}
 			}
 		}
 		return false;
 	}
 
-	private void runSearch(String terms) throws IOException {
-		// TODO, handle sorting terms
+	private void runSearch(String terms, boolean sortOnly) throws IOException {
 		String query = terms;
 		String sort  = language.parseSortToken(terms);
 		String html;
 		try {
-			html = downloadHtml(query, sort);
+			html = downloadHtml(query, sort, sortOnly);
 			SearchPageScraper scraper = new SearchPageScraper(html);
 			items = scraper.parse();
 			System.out.println("items found: " + items.size());
@@ -188,30 +188,39 @@ public class Main {
 		Process p = new ProcessBuilder(ahkPath, ahkScript, msg).start();
 	}
 
-	public String downloadHtml(String query, String sort) throws Exception {
-    	String queryPrefix = config.getProperty("queryprefix");
-		String finalQuery = queryPrefix + " " + query;
-		System.out.println("finalQuery: " + finalQuery);
-		System.out.println("sort: " + sort);
-		String payload = language.parse(finalQuery);
+	public String downloadHtml(String query, String sort, boolean sortOnly) throws Exception {
 		long start = System.currentTimeMillis();
-		String searchPage = backendDownload(sort, payload);
+
+		if (!sortOnly) {
+			String queryPrefix = config.getProperty("queryprefix");
+			String finalQuery = queryPrefix + " " + query;
+			System.out.println("finalQuery: " + finalQuery);
+			String payload = language.parse(finalQuery);
+			location  = submitSearchForm(payload);
+		}
+		
+		System.out.println("sort: " + sort);
+		String searchPage = ajaxSort(sort);
 		long end = System.currentTimeMillis();
+		
 		System.out.println("Took " + (end - start) + " ms");
+		// Add a bit of delay, just in case
+		Thread.sleep(30);
 		return searchPage;
 	}
 
-	private String backendDownload(String sort, String payload) throws Exception {
-		BackendClient backendClient = new BackendClient();
+	private String ajaxSort(String sort) throws Exception {
 		String searchPage = "";
 		sort = URLEncoder.encode(sort, "UTF-8");
 		sort = "sort=" + sort + "&bare=true";
-		String url = "http://poe.trade/search";
-		String location = backendClient.post(url, payload);
-		// Add a bit of delay, just in case
-		Thread.sleep(30);
 		searchPage = backendClient.postXMLHttpRequest(location, sort);
 		return searchPage;
+	}
+
+	private String submitSearchForm(String payload) throws Exception {
+		String url = "http://poe.trade/search";
+		String location = backendClient.post(url, payload);
+		return location;
 	}
 	
     private static Properties loadConfig() throws IOException, FileNotFoundException {
