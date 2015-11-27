@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,9 +43,23 @@ public class BlackmarketLanguage {
 	public String parse(String input) {
 		List<String> tokens = asList(StringUtils.split(input));
 		// translate tokens using language dictionary
-		List<String> translated = tokens.stream().map(this::processToken).collect(toList());
+		List<String> translated = tokens.stream().filter(token -> !isSortToken(token)).map(this::processToken).collect(toList());
 		String finalResult = translated.stream().collect(joining("&"));
 		finalResult = asList(finalResult.split("&")).stream().map(this::encodeQueryParm).collect(joining("&"));
+		return finalResult;
+	}
+	
+	public String parseSortToken(String input) throws IllegalArgumentException {
+		String finalResult = "price_in_chaos";
+		List<String> tokens = asList(StringUtils.split(input));
+		// translate tokens using language dictionary
+		List<String> translated = tokens.stream().filter(token -> isSortToken(token)).map(this::processToken).collect(toList());
+		if (translated.size() > 1) {
+			throw new IllegalArgumentException("More than 1 sort token detected. Only one is allowed.");
+		}
+		if (translated.size() == 1) {
+			finalResult = translated.get(0);
+		}
 		return finalResult;
 	}
 
@@ -72,6 +85,10 @@ public class BlackmarketLanguage {
 			}
 		}
 		return result;
+	}
+	
+	boolean isSortToken(String token) {
+		return token.toLowerCase().startsWith("sort");
 	}
 	
 	String encodeQueryParm(String queryParam) {

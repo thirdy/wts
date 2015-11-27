@@ -2,6 +2,7 @@ package wts;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.URLEncoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,23 +32,6 @@ public class BackendClient {
     public BackendClient() {
 	}
 
-
-    
-    public String search(String payload, String sort) {
-        try {
-            String url = "http://poe.trade/search";
-            String location = post(url, payload);
-            // Add a bit of delay, just in case
-            Thread.sleep(30);
-            String searchPage = "";
-            searchPage = postXMLHttpRequest(location, sort);
-            return searchPage;
-        } catch (Exception ex) {
-            Logger.getLogger(BackendClient.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);
-        }
-    }
-
     public String post(String payload)
             throws Exception {
     	return post("http://poe.trade/search", payload);
@@ -68,9 +52,10 @@ public class BackendClient {
         post.setHeader("Accept-Language", "en-US,en;q=0.5");
         post.setHeader("Accept-Encoding", "gzip, deflate");
         post.setHeader("Referer", "http://poe.trade/");
+    	post.setHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
 //        post.setHeader("Cookie", "_ga=GA1.2.750449977.1440808734; league=Warbands; _gat=1; mb_uid2=6130147680410288830"); // _ga=GA1.2.750449977.1440808734; league=Warbands; _gat=1; mb_uid2=6130147680410288830
         post.setHeader("Connection", "keep-alive");
-        post.setHeader("Content-Type", "application/x-www-form-urlencoded");
+//        post.setHeader("Content-Type", "application/x-www-form-urlencoded");
 
 //        post.setEntity(new UrlEncodedFormEntity(postParams));
         post.setEntity(new StringEntity(payload));
@@ -84,7 +69,7 @@ public class BackendClient {
         System.out.println("Response Code : " + responseCode);
 
         BufferedReader rd = new BufferedReader(
-                new InputStreamReader(response.getEntity().getContent()));
+                new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
 
         StringBuilder result = new StringBuilder();
         String line = "";
@@ -145,7 +130,7 @@ public class BackendClient {
     	System.out.println("Response Code : " + responseCode);
     	
     	BufferedReader rd = new BufferedReader(
-    			new InputStreamReader(response.getEntity().getContent()));
+    			new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
     	
     	StringBuilder result = new StringBuilder();
     	String line = "";
@@ -182,6 +167,7 @@ public class BackendClient {
         get.setHeader("Accept-Language", "en-US,en;q=0.5");
         get.setHeader("Accept-Encoding", "gzip, deflate");
         get.setHeader("Referer", "http://poe.trade/");
+        get.setHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
 //        post.setHeader("Cookie", "_ga=GA1.2.750449977.1440808734; league=Warbands; _gat=1; mb_uid2=6130147680410288830"); // _ga=GA1.2.750449977.1440808734; league=Warbands; _gat=1; mb_uid2=6130147680410288830
         
         HttpResponse response = client.execute(get);
@@ -191,7 +177,7 @@ public class BackendClient {
         System.out.println("Response Code : " + responseCode);
 
         BufferedReader rd = new BufferedReader(
-                new InputStreamReader(response.getEntity().getContent()));
+                new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
 
         StringBuilder result = new StringBuilder();
         String line = "";

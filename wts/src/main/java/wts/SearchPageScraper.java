@@ -1,4 +1,6 @@
 package wts;
+import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 import static org.apache.commons.lang3.StringUtils.trim;
@@ -22,6 +24,7 @@ import wts.SearchPageScraper.SearchResultItem.Mod;
  */
 public class SearchPageScraper {
 
+	private static final String regex_horizontal_whitespace = "(^\\h*)|(\\h*$)";
 	private String page;
 
 	public SearchPageScraper(String page) {
@@ -57,6 +60,8 @@ public class SearchPageScraper {
 			item.ign = element.attr("data-ign");
 			item.league = element.attr("data-league");
 			item.name = element.attr("data-name");
+			item.corrupted = element.getElementsByClass("corrupted").size() > 0;
+			item.identified = element.getElementsByClass("item-unid").size() == 0;
 			
 
 //			System.out.println(String.format("Now parsing item id %s name %s", item.id, item.name));
@@ -118,18 +123,18 @@ public class SearchPageScraper {
 			
 			// ----- Properties ----- //
 			// this is the third column data (the first col is the image, second is the mods, reqs)
-			item.quality = element.getElementsByAttributeValue("data-name", "q").get(0).text();
-			item.physDmgRangeAtMaxQuality = element.getElementsByAttributeValue("data-name", "pd").get(0).text();
-			item.eleDmgRange = element.getElementsByAttributeValue("data-name", "ed").get(0).text();
-			item.attackSpeed = element.getElementsByAttributeValue("data-name", "aps").get(0).text();
-			item.dmgAtMaxQuality = element.getElementsByAttributeValue("data-name", "dps").get(0).text();
-			item.physDmgAtMaxQuality = element.getElementsByAttributeValue("data-name", "pdps").get(0).text();
-			item.eleDmg = element.getElementsByAttributeValue("data-name", "edps").get(0).text();
-			item.armourAtMaxQuality = element.getElementsByAttributeValue("data-name", "armour").get(0).text();
-			item.evasionAtMaxQuality = element.getElementsByAttributeValue("data-name", "evasion").get(0).text();
-			item.energyShieldAtMaxQuality = element.getElementsByAttributeValue("data-name", "shield").get(0).text();
-			item.block = element.getElementsByAttributeValue("data-name", "block").get(0).text();
-			item.crit = element.getElementsByAttributeValue("data-name", "crit").get(0).text();
+			item.quality = element.getElementsByAttributeValue("data-name", "q").get(0).text().replaceAll(regex_horizontal_whitespace,"").trim();
+			item.physDmgRangeAtMaxQuality = element.getElementsByAttributeValue("data-name", "pd").get(0).text().replaceAll(regex_horizontal_whitespace,"").trim();
+			item.eleDmgRange = element.getElementsByAttributeValue("data-name", "ed").get(0).text().replaceAll(regex_horizontal_whitespace,"").trim();
+			item.attackSpeed = element.getElementsByAttributeValue("data-name", "aps").get(0).text().replaceAll(regex_horizontal_whitespace,"").trim();
+			item.dmgAtMaxQuality = element.getElementsByAttributeValue("data-name", "dps").get(0).text().replaceAll(regex_horizontal_whitespace,"").trim();
+			item.physDmgAtMaxQuality = element.getElementsByAttributeValue("data-name", "pdps").get(0).text().replaceAll(regex_horizontal_whitespace,"").trim();
+			item.eleDmg = element.getElementsByAttributeValue("data-name", "edps").get(0).text().replaceAll(regex_horizontal_whitespace,"").trim();
+			item.armourAtMaxQuality = element.getElementsByAttributeValue("data-name", "armour").get(0).text().replaceAll(regex_horizontal_whitespace,"").trim();
+			item.evasionAtMaxQuality = element.getElementsByAttributeValue("data-name", "evasion").get(0).text().replaceAll(regex_horizontal_whitespace,"").trim();
+			item.energyShieldAtMaxQuality = element.getElementsByAttributeValue("data-name", "shield").get(0).text().replaceAll(regex_horizontal_whitespace,"").trim();
+			item.block = element.getElementsByAttributeValue("data-name", "block").get(0).text().replaceAll(regex_horizontal_whitespace,"").trim();
+			item.crit = element.getElementsByAttributeValue("data-name", "crit").get(0).text().replaceAll(regex_horizontal_whitespace,"").trim();
 			// "level"
 			item.imageUrl = element.getElementsByAttributeValue("alt", "Item icon").get(0).attr("src");
 			
@@ -156,6 +161,8 @@ public class SearchPageScraper {
 		String buyout;
 		String name;
 		String ign;
+		public boolean corrupted;
+		public boolean identified;
 		
 		String socketsRaw;
 		
@@ -198,13 +205,24 @@ public class SearchPageScraper {
 		}
 		
 		public String getWTB() {
-			String wtbformat = System.getenv("poe.trade.assist.wtb");
-			if (StringUtils.isNotBlank(wtbformat)) {
-				return String.format(wtbformat, getIgn(), getName(), getBuyout(), getLeague());
-			}
+			String mods = buildWTBModsMessage();
 			return String.format(
-					"@%s Hi, I would like to buy your %s listed for %s in %s.",
-					getIgn(), getName(), getBuyout(), getLeague());
+					"@%s Hi, I would like to buy your %s listed for %s in %s. With stats%s",
+					getIgn(), getName(), getBuyout(), getLeague(), mods);
+		}
+
+		private String buildWTBModsMessage() {
+			StringBuilder sb = new StringBuilder();
+			if (implicitMod != null) {
+				sb.append("--- [Implicit] " + implicitMod.toStringDisplay());
+			}
+			if (explicitMods.size() > 0) {
+				sb.append("--- [Explicit]");
+				for (Mod mod : explicitMods) {
+					sb.append(" --- " + mod.toStringDisplay());
+				}
+			}
+			return sb.toString();
 		}
 
 		/**
@@ -253,107 +271,150 @@ public class SearchPageScraper {
 			}
 		}
 		
+		public String toDisplay(String newLine) {
+			StringBuilder builder = new StringBuilder();
+			String _quality  = isNotBlank(quality) ? " " + quality + "%" : "";
+			String linksocks = isNotBlank(socketsRaw) ? " " + socketsRaw : "";
+			String strCorrupt = corrupted ? " Corrupted " : "";
+			strCorrupt += !identified ? " Unidentified " : "";
+			builder.append(format("[%s] %s%s%s", id, name, linksocks, _quality));
+			builder.append(format("%s -----%s------ ", newLine, strCorrupt));
+			builder.append(newLine);
+			if (implicitMod != null) {
+				builder.append(format("%s", implicitMod.toStringDisplay()));
+				builder.append(newLine + " ----------- " + newLine);
+			}
+			if (explicitMods.size() > 0) {
+				for (Mod mod : explicitMods) {
+					builder.append(format("%s", mod.toStringDisplay()));
+					builder.append(newLine);
+				}
+				builder.append("-----------" + newLine);
+			}
+			String _physDmg 	= isNotBlank(physDmgAtMaxQuality) ? ("pDPS " + physDmgAtMaxQuality) : "";
+			String _eleDmg 		= isNotBlank(eleDmg) 			  ? ("eDPS " + eleDmg) : "";
+			String _attackSpeed = isNotBlank(attackSpeed) 		  ? ("APS " + attackSpeed) : "";
+			String _crit 		= isNotBlank(crit) 				  ? ("Cc " + crit) : "";
+			String offense = format("%s %s %s %s", _physDmg, _eleDmg, _attackSpeed, _crit).trim();
+			offense = offense.isEmpty() ? "" : (offense + newLine);
+			builder.append(offense);
+			
+			String _armour 		= isNotBlank(armourAtMaxQuality) 	? ("Ar " + armourAtMaxQuality) : "";
+			String _evasion 	= isNotBlank(evasionAtMaxQuality) 	? ("Ev " + evasionAtMaxQuality) : "";
+			String _energyShield = isNotBlank(energyShieldAtMaxQuality) ? ("Es " + energyShieldAtMaxQuality) : "";
+			String _block 		= isNotBlank(block) 				? ("Bk " + block) : "";
+			String defense = format("%s %s %s %s", _armour, _evasion, _energyShield, _block).trim();
+			defense = defense.isEmpty() ? "" : (defense + newLine);
+			builder.append(defense);
+			
+			builder.append(format("%s IGN: %s", buyout, ign));
+			return builder.toString();
+		}
+		
 		@Override
 		public String toString() {
-			return getWTB();
-		}
-
-		public String toStringObject() {
 			StringBuilder builder = new StringBuilder();
-			builder.append(System.lineSeparator());
+			String lineSeparator = System.lineSeparator();
+			builder.append(lineSeparator);
 			builder.append("id=");
 			builder.append(id);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("buyout=");
 			builder.append(buyout);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("name=");
 			builder.append(name);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
+			builder.append("corrupted=");
+			builder.append(corrupted);
+			builder.append(lineSeparator);
+			builder.append("identified=");
+			builder.append(identified);
+			builder.append(lineSeparator);
 			builder.append("ign=");
 			builder.append(ign);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("socketsRaw=");
 			builder.append(socketsRaw);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("quality=");
 			builder.append(quality);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("physDmgRangeAtMaxQuality=");
 			builder.append(physDmgRangeAtMaxQuality);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("physDmgAtMaxQuality=");
 			builder.append(physDmgAtMaxQuality);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("eleDmgRange=");
 			builder.append(eleDmgRange);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("attackSpeed=");
 			builder.append(attackSpeed);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("dmgAtMaxQuality=");
 			builder.append(dmgAtMaxQuality);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("crit=");
 			builder.append(crit);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("eleDmg=");
 			builder.append(eleDmg);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("armourAtMaxQuality=");
 			builder.append(armourAtMaxQuality);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("evasionAtMaxQuality=");
 			builder.append(evasionAtMaxQuality);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("energyShieldAtMaxQuality=");
 			builder.append(energyShieldAtMaxQuality);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("block=");
 			builder.append(block);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("reqLvl=");
 			builder.append(reqLvl);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("reqStr=");
 			builder.append(reqStr);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("reqInt=");
 			builder.append(reqInt);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("reqDex=");
 			builder.append(reqDex);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("ageAndHighLvl=");
 			builder.append(ageAndHighLvl);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("league=");
 			builder.append(league);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("seller=");
 			builder.append(seller);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("thread=");
 			builder.append(thread);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("sellerid=");
 			builder.append(sellerid);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("threadUrl=");
 			builder.append(threadUrl);
-			builder.append(System.lineSeparator());
-//			builder.append("imageUrl=");
-//			builder.append(imageUrl);
-//			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
+			builder.append("imageUrl=");
+			builder.append(imageUrl);
+			builder.append(lineSeparator);
 			builder.append("implicitMod=");
 			builder.append(implicitMod);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("explicitMods=");
 			builder.append(explicitMods);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			builder.append("online=");
 			builder.append(online);
-			builder.append(System.lineSeparator());
+			builder.append(lineSeparator);
 			return builder.toString();
 		}
 

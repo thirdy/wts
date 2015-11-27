@@ -6,9 +6,9 @@
 bow								=		type=Bow
 claw							=		type=Claw
 dagger							=		type=Dagger
-1haxe							=		type=One Hand Axe
-1hmace							=		type=One Hand Mace
-1hsword							=		type=One Hand Sword
+axe|1haxe						=		type=One Hand Axe
+mace|1hmace						=		type=One Hand Mace
+sword|1hsword					=		type=One Hand Sword
 sceptre							=		type=Sceptre
 staff							=		type=Staff
 2haxe							=		type=Two Hand Axe
@@ -16,7 +16,7 @@ staff							=		type=Staff
 2hsword							=		type=Two Hand Sword
 wand							=		type=Wand
 
-chest|armour					=		type=Body Armour
+chest|body|bodyarmour			=		type=Body Armour
 boots?							=		type=Boots
 gloves?							=		type=Gloves
 helmet|helm 					=		type=Helmet
@@ -31,6 +31,6 @@ flsk|flask						=		type=Flask
 gem								=		type=Gem
 jwl|jewel						=		type=Jewel
 map								=		type=Map
-quiver							=		type=Quiver
+quiver|quiv						=		type=Quiver
 ring							=		type=Ring
 frag							=		type=Vaal Fragments

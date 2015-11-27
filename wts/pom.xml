@@ -11,6 +11,7 @@
 	<name>wts</name>
 
 	<properties>
+		<wts.version>0.1</wts.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<mainClass>wts.Main</mainClass>
 		<maven.compiler.source>1.8</maven.compiler.source>
@@ -96,7 +97,7 @@
 							<mainClass>${mainClass}</mainClass>
 						</manifest>
 					</archive>
-					<finalName>${artifactId}</finalName>
+					<finalName>${artifactId}-${wts.version}</finalName>
 					<appendAssemblyId>false</appendAssemblyId>
 				</configuration>
 				<executions>

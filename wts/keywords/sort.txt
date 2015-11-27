@@ -1,0 +1,27 @@
+;
+; Sort, note that this is a special case since this is not actually part of the normal POST payload
+; Note that all sort keywords should start by 'sort'
+;
+sortprice		= 		price_in_chaos
+sortlife		=		#(pseudo) (total) +# to maximum Life
+sortcold		=		#(pseudo) (total) +#% to Cold Resistance
+sortfire		=		#(pseudo) (total) +#% to Fire Resistance
+sortlight(ning)?=		#(pseudo) (total) +#% to Lightning Resistance
+sortdex			=		#(pseudo) (total) +# to Dexterity
+sortstr			=		#(pseudo) (total) +# to Strength
+sortint			=		#(pseudo) (total) +# to Intelligence
+
+sortq			=		q
+sortpd			=		quality_pd
+sorted			=		ed
+sortaps			=		aps
+sortpdps		=		quality_dps
+sortedps		=		edps
+sortar			=		quality_armour
+sortev			=		quality_evasion
+sortes			=		quality_shield
+sortbl(oc)?k	=		block
+sortcrit		=		crit
+
+; This is used as sorting key for 'bowchaostrap' explicit mod group
+sortgrp0		= 		#|0
