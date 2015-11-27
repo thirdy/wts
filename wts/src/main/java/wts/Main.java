@@ -61,6 +61,15 @@ public class Main {
 	private String location = "";
 	
 	public static void main(String[] args) throws Exception {
+		System.out.println("Wraeclast Trade Search (WTS) 0.1");
+		System.out.println("WTS is 100% free and open source licensed under GPLv2");
+		System.out.println("Created by: /u/ProFalseIdol IGN: ManicCompression");
+		System.out.println();
+		System.out.println("Project Repo: https://github.com/thirdy/wts");
+		System.out.println("Project Page: http://thirdy.github.io/wts");
+		System.out.println();
+		System.out.println("WTS is fan made tool and is not affiliated with Grinding Gear Games in any way.");
+		
 		try {
 			reloadConfig();
 			new Main();
@@ -89,6 +98,10 @@ public class Main {
 		
 		File logFile = new File(logPath);
 		lastKnownPosition = logFile.length();
+		
+		System.out.println("Startup success, now waiting for commands from client.txt");
+		System.out.println("Run 'reload' to reload all configurations.");
+		
 		exit: while (true) {
 			Thread.sleep(100);
 			long fileLength = logFile.length();
