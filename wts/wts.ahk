@@ -27,7 +27,8 @@ if (parm1 = "$EXIT")
 StringReplace, param1, parm1, $LF, `n, All
 StringReplace, param2, parm2, $LF, `n, All
 
-	
+Menu, tray, Tip, Path of Exile Wraeclast Trading System
+Menu, tray, Icon, resource/wts$.ico
 ;CustomColor = EEAA99  ; Can be any RGB color (it will be made transparent below).
 CustomColor = 000000  ; Can be any RGB color (it will be made transparent below).
 Gui +LastFound +AlwaysOnTop -Caption +ToolWindow  ; +ToolWindow avoids a taskbar button and an alt-tab menu item.
