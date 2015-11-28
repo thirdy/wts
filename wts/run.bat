@@ -1,1 +1,1 @@
-java -jar wts-0.1.jar
+java -jar wts-0.1.1.jar
