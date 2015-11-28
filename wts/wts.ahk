@@ -131,15 +131,17 @@ Class CustomFont
 }
 
 CheckWinActivePOE: 
-	IfWinActive, Path of Exile 
-	If (GuiON = 0) {
-		Gui, Show, x%GuiPositionX% y5 NoActivate
-		GuiON := 1
-	}
-	IfWinNotActive, Path of Exile
-	If (GuiON = 1)
-	{
-		Gui, Hide
-		GuiON = 0
-	}
+	GuiControlGet, focused_control, focus
+	if(WinActive("ahk_class Direct3DWindowClass") && WinActive("Path of Exile"))
+		If (GuiON = 0) {
+			Gui, Show, x%GuiPositionX% y5 NoActivate
+			GuiON := 1
+		}
+	if(!WinActive("ahk_class Direct3DWindowClass") && !WinActive("Path of Exile"))
+		If !focused_control
+			If (GuiON = 1)
+			{
+				Gui, Hide
+				GuiON = 0
+			}
 Return
