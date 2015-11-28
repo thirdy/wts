@@ -34,6 +34,10 @@ To run WTS, you'll need:
  b. ahkpath    - path to your AutoHotKey executable
 4. Run via run.bat
 
+# Contributors
+
+/u/Eruyome87 - AHK icons - see [reddit comment](https://www.reddit.com/message/messages/4i2p30)
+
 ---
 
 WTS is 100% free and open source licensed under GPLv2
