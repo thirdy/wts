@@ -23,13 +23,13 @@ fireres								=		mod_name=(pseudo) (total) +#% to Fire Resistance&mod_min=&mod_
 (\d+)fireres						=		mod_name=(pseudo) (total) +#% to Fire Resistance&mod_min=$GROUP1&mod_max=&group_type=And&group_min=&group_max=&group_count=1
 (\d+)-(\d+)fireres					=		mod_name=(pseudo) (total) +#% to Fire Resistance&mod_min=$GROUP1&mod_max=$GROUP2&group_type=And&group_min=&group_max=&group_count=1
 
-coldres								=		mod_name=(pseudo) (total) +#% Cold Resistance&mod_min=&mod_max=&group_type=And&group_min=&group_max=&group_count=1
-(\d+)coldres						=		mod_name=(pseudo) (total) +#% Cold Resistance&mod_min=$GROUP1&mod_max=&group_type=And&group_min=&group_max=&group_count=1
-(\d+)-(\d+)coldres					=		mod_name=(pseudo) (total) +#% Cold Resistance&mod_min=$GROUP1&mod_max=$GROUP2&group_type=And&group_min=&group_max=&group_count=1
+coldres								=		mod_name=(pseudo) (total) +#% to Cold Resistance&mod_min=&mod_max=&group_type=And&group_min=&group_max=&group_count=1
+(\d+)coldres						=		mod_name=(pseudo) (total) +#% to Cold Resistance&mod_min=$GROUP1&mod_max=&group_type=And&group_min=&group_max=&group_count=1
+(\d+)-(\d+)coldres					=		mod_name=(pseudo) (total) +#% to Cold Resistance&mod_min=$GROUP1&mod_max=$GROUP2&group_type=And&group_min=&group_max=&group_count=1
 
-lightres							=		mod_name=(pseudo) (total) +#% Lightning Resistance&mod_min=&mod_max=&group_type=And&group_min=&group_max=&group_count=1
-(\d+)lightres						=		mod_name=(pseudo) (total) +#% Lightning Resistance&mod_min=$GROUP1&mod_max=&group_type=And&group_min=&group_max=&group_count=1
-(\d+)-(\d+)lightres					=		mod_name=(pseudo) (total) +#% Lightning Resistance&mod_min=$GROUP1&mod_max=$GROUP2&group_type=And&group_min=&group_max=&group_count=1
+lightres							=		mod_name=(pseudo) (total) +#% to Lightning Resistance&mod_min=&mod_max=&group_type=And&group_min=&group_max=&group_count=1
+(\d+)lightres						=		mod_name=(pseudo) (total) +#% to Lightning Resistance&mod_min=$GROUP1&mod_max=&group_type=And&group_min=&group_max=&group_count=1
+(\d+)-(\d+)lightres					=		mod_name=(pseudo) (total) +#% to Lightning Resistance&mod_min=$GROUP1&mod_max=$GROUP2&group_type=And&group_min=&group_max=&group_count=1
 
 ms									=		mod_name=#% increased Movement Speed&mod_min=&mod_max=&group_type=And&group_min=&group_max=&group_count=1
 (\d+)ms								=		mod_name=#% increased Movement Speed&mod_min=$GROUP1&mod_max=&group_type=And&group_min=&group_max=&group_count=1
