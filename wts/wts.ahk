@@ -1,8 +1,9 @@
 ; WTS - Wraeclast Trade System
 ; Version: 1.1 (2015/11/28)
 ;
-; Written by /u/ProFalseIdol on reddit, ManicCompresion in game
-; http://thirdy.github.io/
+; Written by:
+; /u/ProFalseIdol
+; /u/Eruyome87 
 ;
 ; Latest Version will always be at:
 ; https://github.com/thirdy/wts/
@@ -29,19 +30,12 @@ StringReplace, param2, parm2, $LF, `n, All
 
 Menu, tray, Tip, Path of Exile Wraeclast Trading System
 Menu, tray, Icon, resource/wts$.ico
-;CustomColor = EEAA99  ; Can be any RGB color (it will be made transparent below).
 CustomColor = 000000  ; Can be any RGB color (it will be made transparent below).
 Gui +LastFound +AlwaysOnTop -Caption +ToolWindow  ; +ToolWindow avoids a taskbar button and an alt-tab menu item.
-;Gui, Color, %CustomColor%
 Gui, Font, s10
 CustomFont.Add("resource/Fontin-Bold.ttf")
-;Gui, Font, s8 c510B01 q5, Fontin SmallCaps
 Gui, Font, s10 000000 q5, Fontin Bold
-;Gui, Add, Text, vMyText cLime, XXXXX YYYYY  ; XX & YY serve to auto-size the window.
-; Make all pixels of this color transparent and make the text itself translucent (150):
 WinSet, TransColor, %CustomColor% 204
-;SetTimer, UpdateOSD, 200
-;Gosub, UpdateOSD  ; Make the first update immediate rather than waiting for the timer.
 Gui, Add, Text,,%param1%
 ;Get ScreenWidth and align GUI to the right (left border of openend inventory)
 WinGetPos, Xpos, Ypos, ScreenWidth, ScreenHeight, Path of Exile
@@ -53,12 +47,6 @@ Gui, Show, x%GuiPositionX% y5 NoActivate  ; NoActivate avoids deactivating the c
 Gosub, CheckWinActivePOE
 SetTimer, CheckWinActivePOE, 100
 GuiON = 1
-return
-
-;UpdateOSD:
-;MouseGetPos, MouseX, MouseY
-;GuiControl,, MyText, X%MouseX%, Y%MouseY%
-;GuiControl,, MyText, %param1%
 return
 
 ; =======================================================================================

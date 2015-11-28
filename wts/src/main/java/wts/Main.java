@@ -60,6 +60,8 @@ public class Main {
 	private long lastKnownPosition = 0;
 	private String location = "";
 	
+	private static final boolean STANDALONE_MODE = false; // for easier testing
+	
 	public static void main(String[] args) throws Exception {
 		System.out.println("Wraeclast Trade Search (WTS) 0.1");
 		System.out.println("WTS is 100% free and open source licensed under GPLv2");
@@ -85,6 +87,9 @@ public class Main {
 		ahkPath = config.getProperty("ahkpath");
 		if(!new File(ahkPath).exists()) JOptionPane.showMessageDialog(null, "Your AHK path is incorrect: " + ahkPath + ". Update your config.properties file.");
 		logPath = config.getProperty("poelogpath");
+		if (STANDALONE_MODE) {
+			logPath = "standalone.txt";
+		}
 		if(!new File(logPath).exists()) JOptionPane.showMessageDialog(null, "Your Path of Exile Logs path is incorrect: " + logPath + ". Update your config.properties file.");
 		ahkScript = config.getProperty("ahkscript", "wts.ahk");
 		pageSize = Integer.parseInt(config.getProperty("pageSize", "5"));
