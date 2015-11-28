@@ -1,5 +1,5 @@
 ; WTS - Wraeclast Trade System
-; Version: 1 (2015/11/27)
+; Version: 1.1 (2015/11/28)
 ;
 ; Written by /u/ProFalseIdol on reddit, ManicCompresion in game
 ; http://thirdy.github.io/
