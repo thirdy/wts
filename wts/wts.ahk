@@ -43,8 +43,16 @@ WinSet, TransColor, %CustomColor% 204
 ;SetTimer, UpdateOSD, 200
 ;Gosub, UpdateOSD  ; Make the first update immediate rather than waiting for the timer.
 Gui, Add, Text,,%param1%
-Gui +Resize +MaxSize540x640
-Gui, Show, x820 y5 NoActivate  ; NoActivate avoids deactivating the currently active window.
+;Get ScreenWidth and align GUI to the right (left border of openend inventory)
+WinGetPos, Xpos, Ypos, ScreenWidth, ScreenHeight, Path of Exile
+GuiWidthDefault := 330
+GuiPositionX := ScreenWidth * 0.35 + GuiWidthDefault
+GuiHeightMax := ScreenHeight - 20
+Gui +Resize +MaxSize540x%GuiHeightMax%
+Gui, Show, x%GuiPositionX% y5 NoActivate  ; NoActivate avoids deactivating the currently active window.
+Gosub, CheckWinActivePOE
+SetTimer, CheckWinActivePOE, 100
+GuiON = 1
 return
 
 ;UpdateOSD:
@@ -121,3 +129,19 @@ Class CustomFont
 		Return 0
 	}
 }
+
+CheckWinActivePOE: 
+	GuiControlGet, focused_control, focus
+	if(WinActive("ahk_class Direct3DWindowClass") && WinActive("Path of Exile"))
+		If (GuiON = 0) {
+			Gui, Show, x%GuiPositionX% y5 NoActivate
+			GuiON := 1
+		}
+	if(!WinActive("ahk_class Direct3DWindowClass") && !WinActive("Path of Exile"))
+		If !focused_control
+			If (GuiON = 1)
+			{
+				Gui, Hide
+				GuiON = 0
+			}
+Return
