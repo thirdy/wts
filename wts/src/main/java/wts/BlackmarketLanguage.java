@@ -80,7 +80,10 @@ public class BlackmarketLanguage {
 				result = value;
 				// replace placeholder with values captured from regex
 				for (int i = 1; i <= matcher.groupCount(); i++) {
-					result = result.replace("$GROUP" + i, matcher.group(i));
+					String placeholder = "$GROUP" + i;
+					if (result.contains(placeholder)) {
+						result = result.replace(placeholder, matcher.group(i));
+					}
 				}
 			}
 		}
