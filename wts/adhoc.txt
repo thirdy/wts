@@ -1,0 +1,19 @@
+################################################
+ Script used to generate keywords from:
+ http://pathofexile.gamepedia.com/Skills
+################################################
+
+function pad(s, size) {
+    while (s.length < size) s = s + " ";
+    return s;
+}
+
+
+$('table.wikitable .gem-link a').each( function () {
+  var s = $(this).html()
+  var k = s.replace(/\s/g, "");
+  k = k.replace("'", "'?")
+  console.log(pad(k, 40) + "=     name=" + s)
+})
+
+console.log()
