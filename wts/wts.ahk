@@ -1,9 +1,8 @@
 ; WTS - Wraeclast Trade System
 ; Version: 1.1 (2015/11/28)
 ;
-; Written by:
-; /u/ProFalseIdol
-; /u/Eruyome87 
+; Written by /u/ProFalseIdol on reddit, ManicCompresion in game
+; http://thirdy.github.io/
 ;
 ; Latest Version will always be at:
 ; https://github.com/thirdy/wts/
@@ -16,6 +15,22 @@
 #Persistent ; Stay open in background
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
+SetBatchLines, -1
+
+#Include, lib/Gdip_All.ahk
+; https://www.autohotkey.com/boards/viewtopic.php?t=1879
+#Include, lib/Gdip_Ext.ahk
+
+Menu, tray, Tip, Path of Exile - Wraeclast Trade System
+Menu, tray, Icon, resource/wts$.ico
+
+; Start gdi+
+If !pToken := Gdip_Startup()
+{
+   MsgBox, 48, gdiplus error!, Gdiplus failed to start. Please ensure you have gdiplus on your system
+   ExitApp
+}
+OnExit, Exit
 
 parm1 = %1%  ; first input parameter
 parm2 = %2%  ; Second input parameter
@@ -28,25 +43,98 @@ if (parm1 = "$EXIT")
 StringReplace, param1, parm1, $LF, `n, All
 StringReplace, param2, parm2, $LF, `n, All
 
-Menu, tray, Tip, Path of Exile Wraeclast Trading System
-Menu, tray, Icon, resource/wts$.ico
-CustomColor = 000000  ; Can be any RGB color (it will be made transparent below).
-Gui +LastFound +AlwaysOnTop -Caption +ToolWindow  ; +ToolWindow avoids a taskbar button and an alt-tab menu item.
-Gui, Font, s10
-CustomFont.Add("resource/Fontin-Bold.ttf")
-Gui, Font, s10 000000 q5, Fontin Bold
-WinSet, TransColor, %CustomColor% 204
-Gui, Add, Text,,%param1%
-;Get ScreenWidth and align GUI to the right (left border of openend inventory)
+; https://github.com/tariqporter/Gdip/blob/master/Gdip.Tutorial.8-Write.text.onto.a.gui.ahk
+; Set the width and height we want as our drawing area, to draw everything in. This will be the dimensions of our bitmap
 WinGetPos, Xpos, Ypos, ScreenWidth, ScreenHeight, Path of Exile
-GuiWidthDefault := 330
-GuiPositionX := ScreenWidth * 0.35 + GuiWidthDefault
-GuiHeightMax := ScreenHeight - 20
-Gui +Resize +MaxSize540x%GuiHeightMax%
-Gui, Show, x%GuiPositionX% y5 NoActivate  ; NoActivate avoids deactivating the currently active window.
+IniRead, DrawingAreaWidth, overlay_config.ini, Overlay, Width
+IniRead, DrawingAreaHeight, overlay_config.ini, Overlay, Height
+IniRead, DrawingAreaPosX, overlay_config.ini, Overlay, AbsolutePositionLeft
+IniRead, DrawingAreaPosY, overlay_config.ini, Overlay, AbsolutePositionTop
+
+If !DrawingAreaWidth 
+	DrawingAreaWidth = 310
+If !DrawingAreaPosX 
+	DrawingAreaPosX := ScreenWidth * 0.33 + DrawingAreaWidth
+If !DrawingAreaPosY 
+	DrawingAreaPosY := 5
+If !DrawingAreaHeight 
+	DrawingAreaHeight := ScreenHeight - 50
+
+Gui, 1:  -Caption +E0x80000 +LastFound +OwnDialogs +Owner +AlwaysOnTop
+Gui, 1: Show, NA
+
+hwnd1 := WinExist()
+hbm := CreateDIBSection(DrawingAreaWidth, DrawingAreaHeight)
+hdc := CreateCompatibleDC()
+obm := SelectObject(hdc, hbm)
+G := Gdip_GraphicsFromHDC(hdc)
+Gdip_SetSmoothingMode(G, 4)
+
+pBrush := Gdip_BrushCreateSolid(0xffb4804b)
+; left border
+Gdip_FillRectangle(G, pBrush, 0, 0, 1, DrawingAreaHeight)
+; right border
+Gdip_FillRectangle(G, pBrush, DrawingAreaWidth - 2, 0, 1, DrawingAreaHeight)
+; top border
+Gdip_FillRectangle(G, pBrush, 0, 1, DrawingAreaWidth, 1)
+; bottom border
+Gdip_FillRectangle(G, pBrush, 0, DrawingAreaHeight - 2, DrawingAreaWidth, 1)
+; background
+pBrush := Gdip_BrushCreateSolid(0x47000000)
+Gdip_FillRectangle(G, pBrush, 0, 0, DrawingAreaWidth, DrawingAreaHeight)
+
+CustomFont.Add("resource/Fontin-Bold.ttf")
+Font = Fontin
+FontSize = 13
+; Next we can check that the user actually has the font that we wish them to use
+; If they do not then we can do something about it. I choose to default to Arial.
+If !hFamily := Gdip_FontFamilyCreate(Font)
+{
+   ;MsgBox, 48, Font error!, Please install the Font "Fontin" located in subfolder "resource" for a better experience
+   Font = Arial
+   FontSize = 13
+}
+Else {
+	Gdip_DeleteFontFamily(hFamily)
+}
+
+; Extra options:
+; ow4         - Sets the outline width to 4
+; ocFF000000  - Sets the outline colour to opaque black
+; OF1			- If this option is set to 1 the text fill will be drawn using the same path that the outline is drawn.
+Options = x5p y5p w90p h90p Left cffffffff ow2 ocFF000000 OF1 r4 s%FontSize%
+
+Gdip_TextToGraphicsOutline(G, param1, Options, Font, DrawingAreaWidth, DrawingAreaHeight) 
+
+UpdateLayeredWindow(hwnd1, hdc, DrawingAreaPosX, DrawingAreaPosY, DrawingAreaWidth, DrawingAreaHeight)
+
+OnMessage(0x201, "WM_LBUTTONDOWN")
+
 Gosub, CheckWinActivePOE
 SetTimer, CheckWinActivePOE, 100
 GuiON = 1
+
+return
+
+
+WM_LBUTTONDOWN()
+{
+   PostMessage, 0xA1, 2
+}
+
+Exit:
+	Gdip_DeleteBrush(pBrush)
+	SelectObject(hdc, obm)
+	DeleteObject(hbm)
+	DeleteDC(hdc)
+	Gdip_DeleteGraphics(G)
+	Gdip_Shutdown(pToken)
+ExitApp
+
+;UpdateOSD:
+;MouseGetPos, MouseX, MouseY
+;GuiControl,, MyText, X%MouseX%, Y%MouseY%
+;GuiControl,, MyText, %param1%
 return
 
 ; =======================================================================================
@@ -119,17 +207,17 @@ Class CustomFont
 }
 
 CheckWinActivePOE: 
-	GuiControlGet, focused_control, focus
-	if(WinActive("ahk_class Direct3DWindowClass") && WinActive("Path of Exile"))
-		If (GuiON = 0) {
-			Gui, Show, x%GuiPositionX% y5 NoActivate
-			GuiON := 1
-		}
-	if(!WinActive("ahk_class Direct3DWindowClass") && !WinActive("Path of Exile"))
-		If !focused_control
-			If (GuiON = 1)
-			{
-				Gui, Hide
-				GuiON = 0
+		GuiControlGet, focused_control, focus
+		if(WinActive("ahk_class Direct3DWindowClass") && WinActive("Path of Exile"))
+			If (GuiON = 0) {
+				Gui, 1: Show, NA
+				GuiON := 1
 			}
+		if(!WinActive("ahk_class Direct3DWindowClass") && !WinActive("Path of Exile"))
+			;If !focused_control
+				If (GuiON = 1)
+				{
+					Gui, 1: Hide
+					GuiON = 0
+				}
 Return
