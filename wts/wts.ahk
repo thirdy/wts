@@ -1,13 +1,13 @@
 ; WTS - Wraeclast Trade System
+; Version: 1.1 (2015/11/28)
 ;
-; Written by:
-; /u/Eruyome87 
-; /u/ProFalseIdol
+; Written by /u/ProFalseIdol on reddit, ManicCompresion in game
+; http://thirdy.github.io/
 ;
 ; Latest Version will always be at:
 ; https://github.com/thirdy/wts/
 ;
-; Feel free to make pull-requests.
+; Feel free to pull/etc.
 ;
 
 #SingleInstance force ; If it is alReady Running it will be restarted.
@@ -50,6 +50,9 @@ IniRead, DrawingAreaWidth, overlay_config.ini, Overlay, Width
 IniRead, DrawingAreaHeight, overlay_config.ini, Overlay, Height
 IniRead, DrawingAreaPosX, overlay_config.ini, Overlay, AbsolutePositionLeft
 IniRead, DrawingAreaPosY, overlay_config.ini, Overlay, AbsolutePositionTop
+IniRead, Font, overlay_config.ini, Overlay, FontFamily
+IniRead, FontSize, overlay_config.ini, Overlay, FontSize
+CustomFont.Add("resource/Fontin-Bold.ttf")
 
 If !DrawingAreaWidth 
 	DrawingAreaWidth = 310
@@ -59,7 +62,19 @@ If !DrawingAreaPosY
 	DrawingAreaPosY := 5
 If !DrawingAreaHeight 
 	DrawingAreaHeight := ScreenHeight - 50
+If !FontSize
+	FontSize := 13
 
+; Next we can check that the user actually has the font that we wish them to use
+; If they do not then we can do something about it. I choose to default to Arial.
+If !hFamily := Gdip_FontFamilyCreate(Font)
+{
+   Font = Arial
+}
+Else {
+	Gdip_DeleteFontFamily(hFamily)
+}
+	
 Gui, 1:  -Caption +E0x80000 +LastFound +OwnDialogs +Owner +AlwaysOnTop
 Gui, 1: Show, NA
 
@@ -83,27 +98,14 @@ Gdip_FillRectangle(G, pBrush, 0, DrawingAreaHeight - 2, DrawingAreaWidth, 1)
 pBrush := Gdip_BrushCreateSolid(0x47000000)
 Gdip_FillRectangle(G, pBrush, 0, 0, DrawingAreaWidth, DrawingAreaHeight)
 
-CustomFont.Add("resource/Fontin-Bold.ttf")
-Font = Fontin
-FontSize = 13
-; Next we can check that the user actually has the font that we wish them to use
-; If they do not then we can do something about it. I choose to default to Arial.
-If !hFamily := Gdip_FontFamilyCreate(Font)
-{
-   ;MsgBox, 48, Font error!, Please install the Font "Fontin" located in subfolder "resource" for a better experience
-   Font = Arial
-   FontSize = 13
-}
-Else {
-	Gdip_DeleteFontFamily(hFamily)
-}
-
 ; Extra options:
 ; ow4         - Sets the outline width to 4
 ; ocFF000000  - Sets the outline colour to opaque black
 ; OF1			- If this option is set to 1 the text fill will be drawn using the same path that the outline is drawn.
-Options = x5p y5p w90p h90p Left cffffffff ow2 ocFF000000 OF1 r4 s%FontSize%
+Options = x5 y5 w%DrawingAreaWidth%-10 h%DrawingAreaHeight%-10 Left cffffffff ow2 ocFF000000 OF1 r4 s%FontSize%
 
+;Options = x5 y5 w%DrawingAreaWidth%-10 h%DrawingAreaHeight%-10 Left cffffffff r4 s%FontSize%
+;Gdip_TextToGraphics(G, param1, Options, Font, DrawingAreaWidth, DrawingAreaHeight) 
 Gdip_TextToGraphicsOutline(G, param1, Options, Font, DrawingAreaWidth, DrawingAreaHeight) 
 
 UpdateLayeredWindow(hwnd1, hdc, DrawingAreaPosX, DrawingAreaPosY, DrawingAreaWidth, DrawingAreaHeight)
@@ -117,10 +119,25 @@ GuiON = 1
 return
 
 
-WM_LBUTTONDOWN()
-{
+WM_LBUTTONDOWN() {
    PostMessage, 0xA1, 2
 }
+
+; Set Hotkey for toggling GUI overlay completely OFF, default = ctrl + q
+; ^p and ^i conflicts with trackpetes ItemPriceCheck macro
+^q::
+	If (GuiON = 0) {
+		Gosub, CheckWinActivePOE
+		SetTimer, CheckWinActivePOE, 100
+		GuiON = 1
+	}
+	Else {
+		SetTimer, CheckWinActivePOE, Off      
+		Gui, 1: Hide	
+		GuiON = 0
+	}
+return
+		
 
 Exit:
 	Gdip_DeleteBrush(pBrush)
@@ -207,17 +224,17 @@ Class CustomFont
 }
 
 CheckWinActivePOE: 
-		GuiControlGet, focused_control, focus
-		if(WinActive("ahk_class Direct3DWindowClass") && WinActive("Path of Exile"))
-			If (GuiON = 0) {
-				Gui, 1: Show, NA
-				GuiON := 1
-			}
-		if(!WinActive("ahk_class Direct3DWindowClass") && !WinActive("Path of Exile"))
-			;If !focused_control
-				If (GuiON = 1)
-				{
-					Gui, 1: Hide
-					GuiON = 0
-				}
+	GuiControlGet, focused_control, focus
+	if(WinActive("ahk_class Direct3DWindowClass") && WinActive("Path of Exile"))
+		If (GuiON = 0) {
+			Gui, 1: Show, NA
+			GuiON := 1
+		}
+	if(!WinActive("ahk_class Direct3DWindowClass") && !WinActive("Path of Exile"))
+		;If !focused_control
+			If (GuiON = 1)
+		{
+			Gui, 1: Hide
+			GuiON = 0
+		}
 Return
