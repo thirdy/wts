@@ -1,4 +1,4 @@
-; WTS - Wraeclast Trade System
+; QIC (Quasi-In-Chat) Search
 ;
 ; Written by:
 ; /u/Eruyome87 
