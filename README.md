@@ -19,9 +19,9 @@ It monitors the Path of Exile client log file for commands typed in-game and use
 
 # Screenshots
 
-![6](https://cloud.githubusercontent.com/assets/75921/11445426/eeb9d4c2-9566-11e5-814e-5c6f663cfa84.png)
+![6](https://dl.dropboxusercontent.com/u/13620316/wts-screen01.png)
 
-![7](https://cloud.githubusercontent.com/assets/75921/11445437/009bbbf6-9567-11e5-9075-e4dd972a0622.png)
+![7](https://dl.dropboxusercontent.com/u/13620316/wts-screen02.png)
 
 # How to Install/Run
 
@@ -32,11 +32,13 @@ To run WTS, you'll need:
 3. Configure your config.properties file:
  a. poelogpath - path to your Path of Exile Client.txt file
  b. ahkpath    - path to your AutoHotKey executable
-4. Run via run.bat
+4. Configure your overlay_config.ini file if desired (not required).
+5. Install the Path of Exile font "Fontin" for a better experience, located in subfolder "resource" (not required).
+6. Run via run.bat
 
 # Contributors
 
-/u/Eruyome87 - AHK icons - see [reddit comment](https://www.reddit.com/message/messages/4i2p30)
+/u/Eruyome87 - AHK icons and development - see [reddit comment](https://www.reddit.com/message/messages/4i2p30)
 
 ---
 
