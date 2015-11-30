@@ -5,7 +5,9 @@ To run WTS, you'll need:
 3. Configure your config.properties file:
  a. poelogpath - path to your Path of Exile Client.txt file
  b. ahkpath    - path to your AutoHotKey executable
-4. Run via run.bat
+4. (Not required) Configure your overlay_config.ini file if desired.
+5. (Not required) Install the Path of Exile font "Fontin" for a better experience, located in subfolder "resource".
+6. Run via run.bat
 
 For more info visit, project Page:
 http://thirdy.github.io/wts
