@@ -46,7 +46,7 @@ import wts.util.SwingUtil;
  *
  */
 public class Main {
-	
+
 	public static Properties config;
 	public static BlackmarketLanguage language;
 	static String ahkPath;
@@ -56,20 +56,20 @@ public class Main {
 	BackendClient backendClient = new BackendClient();
 	List<SearchResultItem> items = Collections.emptyList();
 	int currentPage = 0;
-	
+
 	private long lastKnownPosition = 0;
 	private String location = "";
-	
+
 	public static void main(String[] args) throws Exception {
-		System.out.println("Wraeclast Trade Search (WTS) 0.1");
-		System.out.println("WTS is 100% free and open source licensed under GPLv2");
+		System.out.println("QIC (Quasi-In-Chat) Search 0.1");
+		System.out.println("QIC is 100% free and open source licensed under GPLv2");
 		System.out.println("Created by: /u/ProFalseIdol IGN: ManicCompression");
 		System.out.println();
 		System.out.println("Project Repo: https://github.com/thirdy/wts");
 		System.out.println("Project Page: http://thirdy.github.io/wts");
 		System.out.println();
-		System.out.println("WTS is fan made tool and is not affiliated with Grinding Gear Games in any way.");
-		
+		System.out.println("QIC is fan made tool and is not affiliated with Grinding Gear Games in any way.");
+
 		try {
 			reloadConfig();
 			new Main();
@@ -86,22 +86,22 @@ public class Main {
 		if(!new File(ahkPath).exists()) JOptionPane.showMessageDialog(null, "Your AHK path is incorrect: " + ahkPath + ". Update your config.properties file.");
 		logPath = config.getProperty("poelogpath");
 		if(!new File(logPath).exists()) JOptionPane.showMessageDialog(null, "Your Path of Exile Logs path is incorrect: " + logPath + ". Update your config.properties file.");
-		ahkScript = config.getProperty("ahkscript", "wts.ahk");
+		ahkScript = config.getProperty("ahkscript", "qic.ahk");
 		pageSize = Integer.parseInt(config.getProperty("pageSize", "5"));
 	}
-	
+
 	public Main() throws IOException, InterruptedException {
-		
+
 //		CommandLine cmd = new CommandLine(args);
 //		String query = cmd.getArguments()[0];
 //		String sort = cmd.getNumberOfArguments() == 2 ? cmd.getArguments()[1] : "price_in_chaos";
-		
+
 		File logFile = new File(logPath);
 		lastKnownPosition = logFile.length();
-		
+
 		System.out.println("Startup success, now waiting for commands from client.txt");
 		System.out.println("Run 'reload' to reload all configurations.");
-		
+
 		exit: while (true) {
 			Thread.sleep(100);
 			long fileLength = logFile.length();
@@ -121,14 +121,14 @@ public class Main {
 			}
 		}
 	}
-	
+
 	private boolean processLine(String line) throws IOException {
 		line = substringAfterLast(line, ":").trim();
-		
+
 		if (!startsWithAny(line, new String[]{"#", "@", "$"})) {
 			if (line.equalsIgnoreCase("searchexit") || line.equalsIgnoreCase("sexit")) {
 				setDisplayMessage("$EXIT");
-				return true; 
+				return true;
 			}
 			if (line.equalsIgnoreCase("searchend") || line.equalsIgnoreCase("se")) {
 				setDisplayMessage("$EXIT");
@@ -192,9 +192,9 @@ public class Main {
 	private void updateDisplay(int page) throws IOException {
 		if(items.isEmpty()) {
 			setDisplayMessage("Result: " + 0);
-			return;			
+			return;
 		}
-		
+
 		int skip = (pageSize * page) % items.size();
 		if (skip >= items.size()) {
 			--currentPage;
@@ -218,11 +218,11 @@ public class Main {
 			String payload = language.parse(finalQuery);
 			location  = submitSearchForm(payload);
 		}
-		
+
 		System.out.println("sort: " + sort);
 		String searchPage = ajaxSort(sort);
 		long end = System.currentTimeMillis();
-		
+
 		System.out.println("Took " + (end - start) + " ms");
 		// Add a bit of delay, just in case
 		Thread.sleep(30);
@@ -242,7 +242,7 @@ public class Main {
 		String location = backendClient.post(url, payload);
 		return location;
 	}
-	
+
     private static Properties loadConfig() throws IOException, FileNotFoundException {
 		Properties config = new Properties();
 		try (BufferedReader br = new BufferedReader(new FileReader(new File("config.properties")))) {
