@@ -21,7 +21,7 @@ SetBatchLines, -1
 ; https://www.autohotkey.com/boards/viewtopic.php?t=1879
 #Include, lib/Gdip_Ext.ahk
 
-Menu, tray, Tip, Path of Exile - Wraeclast Trade System
+Menu, tray, Tip, Path of Exile - QIC (Quasi-In-Chat) Search
 Menu, tray, Icon, resource/wts$.ico
 
 ; Start gdi+
