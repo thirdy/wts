@@ -22,7 +22,7 @@ SetBatchLines, -1
 #Include, lib/Gdip_Ext.ahk
 
 Menu, tray, Tip, Path of Exile - QIC (Quasi-In-Chat) Search
-Menu, tray, Icon, resource/wts$.ico
+Menu, tray, Icon, resource/qic$.ico
 
 ; Start gdi+
 If !pToken := Gdip_Startup()
