@@ -16,6 +16,7 @@ It monitors the Path of Exile client log file for commands typed in-game and use
 * `sort`* - sort current results (see keywords/sort.txt)
 * `view{n}` - view all stats for item #n
 * `searchexit` or `sexit` - stops QIC. You'll need to run _run.bat_ again to execute commands.
+* `ctrl+q` - Toggles the GUI ON/OFF, shortcut can be configured in qic.ahk
 
 # Screenshots
 
