@@ -1,4 +1,4 @@
-To run WTS, you'll need:
+To run QIC, you'll need:
 
 1. Java installed. Go to https://www.java.com/ to download the latest version of Java.
 2. AHK installed. Go to http://ahkscript.org/ to download the latest version of AutoHotkey.
